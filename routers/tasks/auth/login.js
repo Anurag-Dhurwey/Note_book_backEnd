@@ -4,7 +4,7 @@ const User=require("../../../config/models/M.user");
 const bcrypt=require("bcrypt");
 const { body, validationResult } = require('express-validator');
 const login=async(req, res) => {
-
+let success=true;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() })
@@ -20,11 +20,16 @@ const login=async(req, res) => {
             id:existUser._id
         }}
         const authToken=jwt.sign(data,process.env.SECRET_KEY);
-        return res.json(authToken);
+        return res.json({success,authToken});
+     }else{
+      success=false
+      return res.json({success,errors: "wrong pass" });
+
      }
     
    }else{
-    return  res.status(400).json({ errors: "this email is already registerd" });
+    success=false;
+    return  res.status(400).json({success:success, errors: "this email is already registerd" });
    }
     } catch (error) {
       console.log(error.message);
